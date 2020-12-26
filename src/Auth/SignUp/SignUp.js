@@ -2,10 +2,16 @@ import firebase from '../../firebase';
 import React, { useState } from 'react';
 import { Container, Row, Col, Form, FormGroup, Input, Label, Button } from 'reactstrap';
 import Loading from '../../Shared/Loading/Loading';
-
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
 const SignUp = props => {
     const [pending, setPending] = useState(false);
     const signUp = firebase.functions().httpsCallable('userManagement-addUser');
+    const [date, setDate] = useState(null);
+
+    const handleDateChange = date => {
+        setDate(date);
+    };
 
     const handleSignUp = async (e) => {
         e.persist();
@@ -21,7 +27,7 @@ const SignUp = props => {
         const city = form['city'].value;
         const role = form['role'].value;
         const status = role === 'fan' ? 'active' : 'pending';
-        if (password === confirmPassword) {
+        if (password === confirmPassword && date !== null) {
             try {
                 setPending(true);
                 await firebase.auth().createUserWithEmailAndPassword(email, password)
@@ -33,10 +39,14 @@ const SignUp = props => {
                     address: address,
                     city: city,
                     role: role,
-                    status: status
+                    status: status,
+                    dateOfBirth: date
                 })
                 await firebase.auth().currentUser.getIdToken(true);
-                window.location = '/';
+                if (role === 'manager')
+                    window.location = '/manager';
+                else
+                    window.location = '/';
             }
             catch (error) {
                 console.log(error);
@@ -83,6 +93,12 @@ const SignUp = props => {
                                 Last Name
                             </Label>
                             <Input type="text" name='lastName' placeholder="Enter Your Last Name" required />
+                        </FormGroup>
+                        <FormGroup>
+                            <Label style={{ display: 'block' }}>Date of Birth</Label>
+                            <Calendar
+                                onChange={handleDateChange}
+                                value={date}></Calendar>
                         </FormGroup>
                         <Label style={{ display: 'block' }}>
                             Gender

@@ -13,7 +13,6 @@ export const AuthProvider = ({ children }) => {
         const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
             if (user) {
                 user.getIdTokenResult().then(idTokenResult => {
-                    console.log(idTokenResult.claims);
                     user.claims = idTokenResult.claims;
                     setCurrentUser(user);
                 })

@@ -1,19 +1,25 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { Redirect } from 'react-router';
 import { Container, Row, Col, Form, Input, FormGroup, Button, Label } from 'reactstrap';
 import firebase from '../../firebase';
+import { AuthContext } from '../Auth';
 const SignIn = () => {
+    const { currentUser } = useContext(AuthContext);
     const handleSignIn = async (e) => {
         e.preventDefault();
         const form = e.target;
         const email = form['email'].value;
         const password = form['password'].value;
         try {
-            await firebase.auth().signInWithEmailAndPassword(email, password);
+            firebase.auth().signInWithEmailAndPassword(email, password);
         }
         catch (error) {
             console.log(error);
         }
     }
+    if (currentUser)
+        if (currentUser.claims.role === 'manager')
+            return <Redirect to='/manager' />
     return (
         <Container fluid >
 
