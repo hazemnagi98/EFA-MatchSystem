@@ -1,0 +1,5 @@
+.Spinner {
+    position: fixed;
+    top: calc( 50% - ( 32px / 2));
+    left: calc( 50% - ( 32px / 2));
+}

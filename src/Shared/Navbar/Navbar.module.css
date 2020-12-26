@@ -1,0 +1,8 @@
+.NavLink {
+    color: whitesmoke;
+}
+
+.NavLink:hover {
+    text-decoration: none;
+    color: whitesmoke;
+}
