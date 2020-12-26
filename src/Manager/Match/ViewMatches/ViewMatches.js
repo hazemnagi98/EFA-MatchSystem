@@ -9,7 +9,7 @@ const ViewMatches = () => {
     const { currentUser } = useContext(AuthContext);
 
     useEffect(() => {
-        firebase.firestore().collection('matches').onSnapshot(querySnapshot => {
+        const unsubscribe = firebase.firestore().collection('matches').onSnapshot(querySnapshot => {
             setMatches([]);
             if (!querySnapshot.empty) {
                 querySnapshot.forEach(doc => {
@@ -19,9 +19,12 @@ const ViewMatches = () => {
                 })
             }
         })
+        return unsubscribe;
     }, [])
+
     if (currentUser === null)
         return <Redirect to='/signup' />
+
     return (
         <Container className='p-4'>
             <Row>
