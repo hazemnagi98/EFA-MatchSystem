@@ -1,43 +1,51 @@
 import firebase from '../../firebase';
-import React from 'react';
+import React, { useState } from 'react';
 import { Container, Row, Col, Form, FormGroup, Input, Label, Button } from 'reactstrap';
-
-const handleSignUp = async (e) => {
-    e.persist();
-    e.preventDefault();
-    const form = e.target;
-    const firstName = form['firstName'].value;
-    const lastName = form['lastName'].value;
-    const email = form['email'].value;
-    const password = form['password'].value;
-    const confirmPassword = form['confirmPassword'].value;
-    const address = form['address'].value;
-    const gender = form['gender'].value;
-    const city = form['city'].value;
-    const role = form['role'].value;
-    const status = role === 'fan' ? 'active' : 'pending';
-    if (password === confirmPassword) {
-        try {
-            const user = await firebase.auth().createUserWithEmailAndPassword(email, password);
-            await firebase.firestore().collection('users').doc(user.user.uid).set({
-                email: email,
-                firstName: firstName,
-                lastName: lastName,
-                gender: gender,
-                address: address,
-                city: city,
-                role: role,
-                status: status
-            })
-        }
-        catch (error) {
-            console.log(error);
-        }
-    }
-}
-
+import Loading from '../../Shared/Loading/Loading';
 
 const SignUp = props => {
+    const [pending, setPending] = useState(false);
+    const signUp = firebase.functions().httpsCallable('userManagement-addUser');
+
+    const handleSignUp = async (e) => {
+        e.persist();
+        e.preventDefault();
+        const form = e.target;
+        const firstName = form['firstName'].value;
+        const lastName = form['lastName'].value;
+        const email = form['email'].value;
+        const password = form['password'].value;
+        const confirmPassword = form['confirmPassword'].value;
+        const address = form['address'].value;
+        const gender = form['gender'].value;
+        const city = form['city'].value;
+        const role = form['role'].value;
+        const status = role === 'fan' ? 'active' : 'pending';
+        if (password === confirmPassword) {
+            try {
+                setPending(true);
+                await firebase.auth().createUserWithEmailAndPassword(email, password)
+                await signUp({
+                    email: email,
+                    firstName: firstName,
+                    lastName: lastName,
+                    gender: gender,
+                    address: address,
+                    city: city,
+                    role: role,
+                    status: status
+                })
+                await firebase.auth().currentUser.getIdToken(true);
+                window.location = '/';
+            }
+            catch (error) {
+                console.log(error);
+            }
+        }
+    }
+
+    if (pending)
+        return <Loading />
     return (
         <Container fluid >
 

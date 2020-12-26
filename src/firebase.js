@@ -1,6 +1,7 @@
 import firebase from 'firebase/app';
 import "firebase/auth";
 import "firebase/firestore";
+import "firebase/functions";
 let config = {
     apiKey: "AIzaSyD5rcwXy2G1Tp6mmC42sAxRtqwLueAtKHw",
     authDomain: "efa-match-system.firebaseapp.com",
@@ -24,5 +25,7 @@ firebase.firestore().enablePersistence({ synchronizeTabs: true }).catch(function
         // features required to enable persistence
     }
 });
+
+firebase.functions().useEmulator("localhost", 5001);
 
 export default firebase;

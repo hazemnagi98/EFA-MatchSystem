@@ -5,6 +5,7 @@ import AdminLogin from './AdminLogin/AdminLogin';
 const AdminDashboard = () => {
     const [users, setUsers] = useState([]);
     const [authenticated, setAuthenticated] = useState(false);
+    const deleteUser = firebase.functions().httpsCallable('userManagement-deleteUser');
 
     useEffect(() => {
         setUsers([]);
@@ -14,10 +15,9 @@ const AdminDashboard = () => {
                 if (!querySnapshot.empty) {
                     querySnapshot.forEach(doc => {
                         if (doc.exists) {
-                            if (doc.data().role !== 'admin')
-                                setUsers(prev => {
-                                    return [...prev, doc.data()];
-                                })
+                            setUsers(prev => {
+                                return [...prev, doc.data()];
+                            })
                         }
                     })
                 }
@@ -34,7 +34,7 @@ const AdminDashboard = () => {
     const pendingUsers = [];
     users.forEach(user => {
         if (user.status === 'pending')
-            activeUsers.push(user);
+            pendingUsers.push(user);
     })
 
     const handleActivate = async (user) => {
@@ -52,10 +52,7 @@ const AdminDashboard = () => {
     }
     const handleDelete = async (user) => {
         try {
-            const userDoc = await firebase.firestore().collection('users').where('email', '==', user.email).get();
-            if (!userDoc.empty) {
-                await firebase.firestore().collection('users').doc(userDoc.docs[0].id).delete();
-            }
+            deleteUser({ email: user.email });
         }
         catch (error) {
             console.log(error);

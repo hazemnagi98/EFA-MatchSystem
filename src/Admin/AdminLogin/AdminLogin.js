@@ -8,11 +8,9 @@ const AdminLogin = (props) => {
         const email = form['email'].value;
         const password = form['password'].value;
         try {
-            await firebase.auth().signInWithEmailAndPassword(email, password);
-            const querySnapshot = await firebase.firestore().collection('admin').where('email', '==', email).get();
-            if (!querySnapshot.empty) {
+            const user = await firebase.auth().signInWithEmailAndPassword(email, password);
+            if (user && !user.user.claims.role)
                 props.setAuthenticated(true);
-            }
             else {
                 await firebase.auth().signOut();
                 alert('Account Does Not Exist');
