@@ -1,32 +1,35 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { Redirect } from 'react-router';
-import { Container, Row, Col, Form, Input, FormGroup, Button, Label } from 'reactstrap';
+import { Container, Row, Col, Form, Input, FormGroup, Button, Label, Alert } from 'reactstrap';
 import firebase from '../../firebase';
 import { AuthContext } from '../Auth';
 const SignIn = () => {
     const { currentUser } = useContext(AuthContext);
+    const [warning, setWarning] = useState(null);
     const handleSignIn = async (e) => {
         e.preventDefault();
         const form = e.target;
         const email = form['email'].value;
         const password = form['password'].value;
         try {
-            firebase.auth().signInWithEmailAndPassword(email, password);
+            await firebase.auth().signInWithEmailAndPassword(email, password);
         }
         catch (error) {
-            console.log(error);
+            setWarning(<Alert color='danger'>Email does not exist</Alert>)
         }
     }
     if (currentUser)
         if (currentUser.claims.role === 'manager')
             return <Redirect to='/manager' />
+        else if (currentUser.claims.role === 'fan')
+            return <Redirect to='/me/matches' />
     return (
         <Container fluid >
-
             <Row className='m-0 mt-4 mb-4'>
                 <Col className='p-3' lg={{ size: 8, offset: 2 }} md={12} sm={12} style={{ backgroundColor: 'lightblue', borderRadius: '20px' }}>
                     <h5>Sign In</h5>
                     <hr />
+                    {warning}
                     <Form name='signup' onSubmit={e => handleSignIn(e)}>
                         <FormGroup>
                             <Label>

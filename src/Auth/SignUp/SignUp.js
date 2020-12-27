@@ -1,11 +1,12 @@
 import firebase from '../../firebase';
 import React, { useState } from 'react';
-import { Container, Row, Col, Form, FormGroup, Input, Label, Button } from 'reactstrap';
+import { Container, Row, Col, Form, FormGroup, Input, Label, Button, Alert } from 'reactstrap';
 import Loading from '../../Shared/Loading/Loading';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 const SignUp = props => {
     const [pending, setPending] = useState(false);
+    const [warning, setWarning] = useState(null);
     const signUp = firebase.functions().httpsCallable('userManagement-addUser');
     const [date, setDate] = useState(null);
 
@@ -49,7 +50,8 @@ const SignUp = props => {
                     window.location = '/';
             }
             catch (error) {
-                console.log(error);
+                setWarning(<Alert color='danger'>Email Already Exists</Alert>)
+                setPending(false);
             }
         }
     }
@@ -63,6 +65,7 @@ const SignUp = props => {
                 <Col className='p-3' lg={{ size: 8, offset: 2 }} md={12} sm={12} style={{ backgroundColor: 'lightblue', borderRadius: '20px' }}>
                     <h5>Sign Up</h5>
                     <hr />
+                    {warning}
                     <Form name='signup' onSubmit={e => handleSignUp(e)}>
                         <FormGroup>
                             <Label>
