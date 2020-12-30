@@ -66,6 +66,8 @@ const FanViewMatches = () => {
             transaction.update(userDoc, {
                 reservations: firebase.firestore.FieldValue.arrayUnion({
                     matchID: match.id,
+                    matchName: match.data.name,
+                    matchDate: match.data.date,
                     seat: newMatch.data.seatsStatus[index],
                     date: match.data.date
                 })
