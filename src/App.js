@@ -11,6 +11,10 @@ import Guest from './Guest/Guest';
 import FanViewMatches from './Fan/FanViewMatches/FanViewMatches';
 import EditDetails from './Fan/EditDetails/EditDetails';
 import ChangePassword from './Fan/ChangePassword/ChangePassword';
+import VerifiedManagerRoute from './Auth/ManagerRoutes/VerifiedManagerRoute';
+import PendingManagerRoute from './Auth/ManagerRoutes/PendingManagerRoute';
+import Pending from './Manager/Pending/Pending';
+import Reservations from './Fan/Reservations/Reservations';
 function App() {
   return (
     <AuthProvider>
@@ -27,15 +31,15 @@ function App() {
             <Route exact path='/admin'>
               <AdminDashboard />
             </Route>
-            <Route exact path='/manager'>
+            <VerifiedManagerRoute exact path='/manager'>
               <Manager />
-            </Route>
-            <Route exact path='/manager/matches'>
+            </VerifiedManagerRoute>
+            <VerifiedManagerRoute exact path='/manager/matches'>
               <ViewMatches />
-            </Route>
-            <Route path='/manager/matches/:id'>
+            </VerifiedManagerRoute>
+            <VerifiedManagerRoute path='/manager/matches/:id'>
               <MatchCard />
-            </Route>
+            </VerifiedManagerRoute>
             <Route exact path='/home'>
               <Guest />
             </Route>
@@ -45,8 +49,14 @@ function App() {
             <Route exact path='/me/profile'>
               <EditDetails />
             </Route>
+            <PendingManagerRoute exact path='/pending'>
+              <Pending />
+            </PendingManagerRoute>
             <Route exact path='/me/changepassword'>
               <ChangePassword />
+            </Route>
+            <Route exact path='/me/reservations'>
+              <Reservations />
             </Route>
             <Redirect to='/signin' />
           </Switch>

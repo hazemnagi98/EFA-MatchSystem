@@ -29,6 +29,7 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     useEffect(() => {
+        setPending(true);
         if (currentUser) {
             const unsubscribe = firebase.firestore().collection('users').doc(currentUser.uid).onSnapshot(querySnapshot => {
                 setUserInfo(querySnapshot.data());
@@ -36,6 +37,7 @@ export const AuthProvider = ({ children }) => {
             });
             return unsubscribe;
         }
+        setPending(false);
     }, [currentUser]);
 
     if (pending) {

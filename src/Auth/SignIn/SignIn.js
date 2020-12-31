@@ -15,14 +15,19 @@ const SignIn = () => {
             await firebase.auth().signInWithEmailAndPassword(email, password);
         }
         catch (error) {
-            setWarning(<Alert color='danger'>Email does not exist</Alert>)
+            setWarning(<Alert color='danger'>Invalid Email or Password</Alert>)
         }
     }
     if (currentUser)
-        if (currentUser.claims.role === 'manager')
-            return <Redirect to='/manager' />
-        else if (currentUser.claims.role === 'fan')
-            return <Redirect to='/me/matches' />
+        if (currentUser.claims.role) {
+            if (currentUser.claims.role === 'manager')
+                return <Redirect to='/manager' />
+            else if (currentUser.claims.role === 'fan')
+                return <Redirect to='/me/matches' />
+        }
+        else {
+            return <Redirect to='/admin' />
+        }
     return (
         <Container fluid >
             <Row className='m-0 mt-4 mb-4'>

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Navbar, Nav, NavLink, NavbarBrand, NavItem, Button, NavbarToggler, Collapse } from 'reactstrap';
 import classes from './Navbar.module.css';
@@ -20,8 +20,19 @@ const NavBar = () => {
     const [isAdminOpen, setIsAdminOpen] = useState(false);
     const [isManagerOpen, setIsManagerOpen] = useState(false);
     const [isFanOpen, setIsFanOpen] = useState(false);
+    const [managerStatus, setManagerStatus] = useState(null);
 
-
+    useEffect(() => {
+        if (currentUser) {
+            const unsubscribe = firebase.firestore().collection('users').doc(currentUser.uid).onSnapshot(doc => {
+                if (doc.exists) {
+                    if (doc.data().role === 'manager')
+                        setManagerStatus(doc.data().status);
+                }
+            })
+            return unsubscribe
+        }
+    }, [currentUser])
 
     const toggle = () => setIsOpen(!isOpen);
     const toggleAdmin = () => setIsAdminOpen(!isAdminOpen);
@@ -63,9 +74,18 @@ const NavBar = () => {
             </NavbarToggler>
             <Collapse isOpen={isAdminOpen} navbar style={{ textAlign: 'right', flexDirection: 'row-reverse' }}>
                 <Nav>
+
+                    <NavItem className={classes.NavLink} style={{ display: 'flex', alignItems: 'center' }}>
+                        <div>
+                            <FontAwesomeIcon icon={faUsersCog} />{'  '}User Management
+                        </div>
+                    </NavItem>
                     <NavItem className={classes.NavLink}>
-                        <FontAwesomeIcon icon={faUsersCog} />{'  '}User Management
-            </NavItem>
+                        <Button onClick={handleSignOut} style={{ backgroundColor: 'transparent', border: 'none' }}>
+                            <FontAwesomeIcon icon={faSignOutAlt} />
+                            {'  '}Sign Out
+                        </Button>
+                    </NavItem>
                 </Nav>
             </Collapse>
         </Navbar>)
@@ -133,17 +153,20 @@ const NavBar = () => {
             </Collapse>
         </Navbar>
     )
-
     if (currentUser === null)
         return signedOutNavbar;
     else if (currentUser.claims.role) {
-        if (currentUser.claims.role === 'manager')
+        if (currentUser.claims.role === 'manager' && managerStatus === 'active')
             return managerNavbar;
+        if (currentUser.claims.role === 'manager' && managerStatus === 'pending')
+            return unverifiedManagerNavbar;
         if (currentUser.claims.role === 'fan')
             return fanNavbar;
     }
     else if (!currentUser.claims.role)
         return adminNavbar;
+
+    return <div></div>
 }
 
 export default NavBar;

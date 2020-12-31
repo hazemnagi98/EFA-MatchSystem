@@ -1,10 +1,13 @@
 import firebase from '../../firebase';
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Container, Row, Col, Form, FormGroup, Input, Label, Button, Alert } from 'reactstrap';
 import Loading from '../../Shared/Loading/Loading';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
+import { AuthContext } from '../Auth';
+import { Redirect } from 'react-router-dom';
 const SignUp = props => {
+    const { currentUser } = useContext(AuthContext);
     const [pending, setPending] = useState(false);
     const [warning, setWarning] = useState(null);
     const signUp = firebase.functions().httpsCallable('userManagement-addUser');
@@ -55,6 +58,16 @@ const SignUp = props => {
             }
         }
     }
+    if (currentUser)
+        if (currentUser.claims.role) {
+            if (currentUser.claims.role === 'manager')
+                return <Redirect to='/manager' />
+            else if (currentUser.claims.role === 'fan')
+                return <Redirect to='/me/matches' />
+        }
+        else {
+            return <Redirect to='/admin' />
+        }
 
     if (pending)
         return <Loading />
