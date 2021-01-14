@@ -7,7 +7,7 @@ import 'react-calendar/dist/Calendar.css';
 import { AuthContext } from '../Auth';
 import { Redirect } from 'react-router-dom';
 const SignUp = props => {
-    const { currentUser } = useContext(AuthContext);
+    const { currentUser, userInfo } = useContext(AuthContext);
     const [pending, setPending] = useState(false);
     const [warning, setWarning] = useState(null);
     const signUp = firebase.functions().httpsCallable('userManagement-addUser');
@@ -35,22 +35,27 @@ const SignUp = props => {
             try {
                 setPending(true);
                 await firebase.auth().createUserWithEmailAndPassword(email, password)
-                await signUp({
-                    email: email,
-                    firstName: firstName,
-                    lastName: lastName,
-                    gender: gender,
-                    address: address,
-                    city: city,
-                    role: role,
-                    status: status,
-                    dateOfBirth: date
-                })
+                try {
+                    await signUp({
+                        email: email,
+                        firstName: firstName,
+                        lastName: lastName,
+                        gender: gender,
+                        address: address,
+                        city: city,
+                        role: role,
+                        status: status,
+                        dateOfBirth: firebase.firestore.Timestamp.fromDate(date)
+                    })
+                }
+                catch (error) {
+                    console.log(error);
+                }
                 await firebase.auth().currentUser.getIdToken(true);
                 if (role === 'manager')
                     window.location = '/manager';
                 else
-                    window.location = '/';
+                    window.location = '/me/matches';
             }
             catch (error) {
                 setWarning(<Alert color='danger'>Email Already Exists</Alert>)
@@ -66,7 +71,12 @@ const SignUp = props => {
                 return <Redirect to='/me/matches' />
         }
         else {
-            return <Redirect to='/admin' />
+            if (userInfo) {
+                if (userInfo.email === 'admin@gmail.com')
+                    return <Redirect to='/admin' />
+                else
+                    return <Loading />
+            }
         }
 
     if (pending)

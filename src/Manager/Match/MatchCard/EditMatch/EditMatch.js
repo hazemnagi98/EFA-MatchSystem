@@ -78,7 +78,7 @@ const EditMatch = (props) => {
         const firstLinesman = form['firstLinesman'].value;
         const secondLinesman = form['secondLinesman'].value;
         const stadium = form['stadium'].value;
-        if (stadium !== '' && date !== null && date < new Date()) {
+        if (stadium !== '' && date !== null) {
             const stadiumObject = await firebase.firestore().collection('stadiums').where('name', '==', stadium).get();
             if (!stadiumObject.empty) {
                 const seatsStatus = [];

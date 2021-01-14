@@ -60,9 +60,12 @@ const AdminDashboard = () => {
     }
 
     if (!currentUser)
-        return <Redirect to='/sigin' />
+        return <Redirect to='/signin' />
     if (currentUser && currentUser.claims.role) {
-        return <Redirect to='/' />
+        if (currentUser.claims.role === 'fan')
+            return <Redirect to='/me/matches' />
+        if (currentUser.claims.role === 'manager')
+            return <Redirect to='/manager' />
     }
     return (
         <>

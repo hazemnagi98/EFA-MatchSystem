@@ -14,13 +14,13 @@ const Reservations = () => {
         if (currentUser) {
             const unsubscribe = firebase.firestore().collection('users').doc(currentUser.uid).onSnapshot((querySnapshot) => {
                 if (querySnapshot.exists) {
-                    setReservations(querySnapshot.data().reservations);
+                    if (querySnapshot.data().reservations)
+                        setReservations(querySnapshot.data().reservations);
                 }
             })
             return unsubscribe;
         }
     }, [currentUser])
-
     const handleCancelReservation = async (reservation) => {
         try {
             toggle();
@@ -51,32 +51,33 @@ const Reservations = () => {
     }
     const reservationsList = [];
     reservations.forEach(reservation => {
-        reservationsList.push(
-            <Col lg={4} md={6} sm={12} className='p-2' style={{ borderRadius: '10px' }}>
-                <ListGroupItem>
-                    <ListGroupItemHeading className='text-center'>
-                        {reservation.matchName}
-                    </ListGroupItemHeading>
+        if (reservation.matchDate.toDate() > new Date())
+            reservationsList.push(
+                <Col lg={4} md={6} sm={12} className='p-2' style={{ borderRadius: '10px' }}>
                     <ListGroupItem>
-                        <ListGroupItemText>
-                            Date: {reservation.matchDate.toDate().toLocaleDateString()}
-                        </ListGroupItemText>
-                        <ListGroupItemText>
-                            Seat:
-                </ListGroupItemText>
-                        <ListGroupItemText>
-                            Row: {reservation.seat.row}
-                        </ListGroupItemText>
-                        <ListGroupItemText>
-                            Seat: {reservation.seat.seat}
-                        </ListGroupItemText>
-                        <Button block outline color='danger' onClick={() => handleSetCancel(reservation)}>Cancel Reservation</Button>
+                        <ListGroupItemHeading className='text-center'>
+                            {reservation.matchName}
+                        </ListGroupItemHeading>
+                        <ListGroupItem>
+                            <ListGroupItemText>
+                                Date: {reservation.matchDate.toDate().toLocaleDateString()}
+                            </ListGroupItemText>
+                            <ListGroupItemText>
+                                Seat:
+                            </ListGroupItemText>
+                            <ListGroupItemText>
+                                Row: {reservation.seat.row}
+                            </ListGroupItemText>
+                            <ListGroupItemText>
+                                Seat: {reservation.seat.seat}
+                            </ListGroupItemText>
+                            <Button block outline color='danger' onClick={() => handleSetCancel(reservation)}>Cancel Reservation</Button>
+                        </ListGroupItem>
+
                     </ListGroupItem>
 
-                </ListGroupItem>
-
-            </Col>
-        )
+                </Col>
+            )
     })
     if (!currentUser) {
         return <Redirect to='/signin' />

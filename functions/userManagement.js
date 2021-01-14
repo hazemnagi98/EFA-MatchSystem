@@ -6,7 +6,6 @@ exports.addUser = functions.https.onCall(async (data, context) => {
     await admin.auth().setCustomUserClaims(context.auth.uid, {
         role: data.role
     })
-
     await userDoc.set({
         firstName: data.firstName,
         lastName: data.lastName,
@@ -15,7 +14,8 @@ exports.addUser = functions.https.onCall(async (data, context) => {
         role: data.role,
         status: data.role === 'fan' ? 'active' : 'pending',
         city: data.city,
-        address: data.address
+        address: data.address,
+        dateOfBirth: new admin.firestore.Timestamp(data.dateOfBirth.seconds, data.dateOfBirth.nanoseconds)
     })
 
     return 'Success';

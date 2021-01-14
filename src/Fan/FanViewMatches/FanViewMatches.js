@@ -43,14 +43,15 @@ const FanViewMatches = () => {
         }
 
         let clash = false;
-
-        userInfo.reservations.forEach(reservation => {
-            if (reservation.date.toDate().toLocaleString() === match.data.date.toDate().toLocaleString()
-                && reservation.matchID !== match.id) {
-                clash = true;
-                return;
-            }
-        })
+        if (userInfo.reservations) {
+            userInfo.reservations.forEach(reservation => {
+                if (reservation.date.toDate().toLocaleString() === match.data.date.toDate().toLocaleString()
+                    && reservation.matchID !== match.id) {
+                    clash = true;
+                    return;
+                }
+            })
+        }
 
         if (clash)
             return alert('Cannot Make Reservation, clash detected');
