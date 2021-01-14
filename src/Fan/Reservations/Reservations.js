@@ -23,6 +23,7 @@ const Reservations = () => {
 
     const handleCancelReservation = async (reservation) => {
         try {
+            toggle();
             await firebase.firestore().collection('users').doc(currentUser.uid).update({
                 reservations: firebase.firestore.FieldValue.arrayRemove(reservation)
             })

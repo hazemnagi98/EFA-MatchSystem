@@ -15,7 +15,8 @@ const Guest = () => {
             if (!querySnapshot.empty) {
                 querySnapshot.forEach(doc => {
                     if (doc.exists) {
-                        setMatches(prev => [...prev, doc.data()]);
+                        if (!(doc.data().date.toDate() < new Date()))
+                            setMatches(prev => [...prev, doc.data()]);
                     }
                 })
             }
